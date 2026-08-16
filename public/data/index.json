@@ -1,0 +1,8 @@
+{
+  "subjects": [
+    { "id": "s-guowen", "name": "國文", "order": 0 }
+  ],
+  "chapters": [
+    { "id": "c-buyin", "subjectId": "s-guowen", "name": "ㄅ音錯別字", "order": 0 }
+  ]
+}
