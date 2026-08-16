@@ -33,6 +33,18 @@ const indexData = {
   ],
 }
 
+const multiSubjectIndexData = {
+  subjects: [
+    { id: 's1', name: '國文', order: 0 },
+    { id: 's2', name: '數學', order: 1 },
+  ],
+  chapters: [
+    { id: 'c1', subjectId: 's1', name: '第一章', order: 0 },
+    { id: 'c2', subjectId: 's1', name: '第二章', order: 1 },
+    { id: 'c3', subjectId: 's2', name: '第一章', order: 0 },
+  ],
+}
+
 describe('HomePage', () => {
   it('lists chapters for the selected subject and starts the quiz with merged questions', async () => {
     vi.mocked(dataLoader.loadIndex).mockResolvedValue(indexData)
@@ -60,5 +72,22 @@ describe('HomePage', () => {
 
     await userEvent.click(await screen.findByText('國文'))
     expect(screen.getByRole('button', { name: /開始複習/ })).toBeDisabled()
+  })
+
+  it('clears the chapter selection when switching to another subject and back', async () => {
+    vi.mocked(dataLoader.loadIndex).mockResolvedValue(multiSubjectIndexData)
+
+    renderHome()
+
+    await userEvent.click(await screen.findByText('國文'))
+    const firstChapterCheckbox = screen.getByLabelText('第一章') as HTMLInputElement
+    await userEvent.click(firstChapterCheckbox)
+    expect(firstChapterCheckbox).toBeChecked()
+
+    await userEvent.click(screen.getByText('數學'))
+    await userEvent.click(screen.getByText('國文'))
+
+    const firstChapterCheckboxAgain = screen.getByLabelText('第一章') as HTMLInputElement
+    expect(firstChapterCheckboxAgain).not.toBeChecked()
   })
 })
