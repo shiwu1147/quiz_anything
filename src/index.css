@@ -1,0 +1,54 @@
+:root {
+  --ground:      #F2F4EF;
+  --surface:     #FCFDFA;
+  --surface-2:   #E9EDE5;
+  --rule:        #D3DACB;
+  --rule-soft:   rgba(31,107,79,.10);
+  --ink:         #1B211D;
+  --ink-2:       #4E574F;
+  --ink-3:       #7C857D;
+  --accent:      #1F6B4F;
+  --accent-ink:  #12402F;
+  --accent-soft: #DCE9E0;
+  --accent-line: #9EC4AE;
+  --vermilion:   #A93226;
+  --verm-soft:   #F6E2DF;
+  --verm-line:   #DCA69E;
+  --shadow: 0 1px 2px rgba(27,33,29,.05), 0 8px 24px -12px rgba(27,33,29,.18);
+  --font-display: "Noto Serif TC","Source Han Serif TC","Songti TC","PMingLiU","MingLiU",serif;
+  --font-body: "Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC","Helvetica Neue",sans-serif;
+  --font-mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #12160F;
+    --surface:     #1A1F19;
+    --surface-2:   #232921;
+    --rule:        #333B31;
+    --rule-soft:   rgba(122,193,157,.10);
+    --ink:         #E7EBE2;
+    --ink-2:       #A9B2A6;
+    --ink-3:       #7C857B;
+    --accent:      #7AC19D;
+    --accent-ink:  #C6E6D5;
+    --accent-soft: #1E3229;
+    --accent-line: #3E6852;
+    --vermilion:   #E3897C;
+    --verm-soft:   #33211E;
+    --verm-line:   #6E403A;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
