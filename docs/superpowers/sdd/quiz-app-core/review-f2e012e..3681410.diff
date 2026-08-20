@@ -1,0 +1,82 @@
+# Review package: f2e012e..3681410
+
+## Commits
+3681410 feat: add shuffle and score-commentary pure logic
+
+## Files changed
+ src/lib/quizLogic.test.ts | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ src/lib/quizLogic.ts      | 15 +++++++++++++++
+ 2 files changed, 59 insertions(+)
+
+## Diff
+diff --git a/src/lib/quizLogic.test.ts b/src/lib/quizLogic.test.ts
+new file mode 100644
+index 0000000..48112af
+--- /dev/null
++++ b/src/lib/quizLogic.test.ts
+@@ -0,0 +1,44 @@
++import { describe, it, expect } from 'vitest'
++import { shuffle, scoreCommentary } from './quizLogic'
++
++describe('shuffle', () => {
++  it('returns a new array with the same elements', () => {
++    const input = [1, 2, 3, 4]
++    const result = shuffle(input, () => 0.999)
++    expect(result).not.toBe(input)
++    expect([...result].sort()).toEqual([1, 2, 3, 4])
++  })
++
++  it('produces a deterministic order for a deterministic rng', () => {
++    const result = shuffle([1, 2, 3, 4], () => 0)
++    expect(result).toEqual([2, 3, 4, 1])
++  })
++
++  it('does not mutate the input array', () => {
++    const input = [1, 2, 3]
++    shuffle(input, () => 0)
++    expect(input).toEqual([1, 2, 3])
++  })
++})
++
++describe('scoreCommentary', () => {
++  it('returns the top-tier message at 90% and above', () => {
++    expect(scoreCommentary(90)).toMatch(/推進/)
++    expect(scoreCommentary(100)).toMatch(/推進/)
++  })
++
++  it('returns the second-tier message between 70% and 89%', () => {
++    expect(scoreCommentary(70)).toMatch(/解析/)
++    expect(scoreCommentary(89)).toMatch(/解析/)
++  })
++
++  it('returns the third-tier message between 50% and 69%', () => {
++    expect(scoreCommentary(50)).toMatch(/重讀/)
++    expect(scoreCommentary(69)).toMatch(/重讀/)
++  })
++
++  it('returns the lowest-tier message below 50%', () => {
++    expect(scoreCommentary(0)).toMatch(/答錯題目/)
++    expect(scoreCommentary(49)).toMatch(/答錯題目/)
++  })
++})
+diff --git a/src/lib/quizLogic.ts b/src/lib/quizLogic.ts
+new file mode 100644
+index 0000000..eefb060
+--- /dev/null
++++ b/src/lib/quizLogic.ts
+@@ -0,0 +1,15 @@
++export function shuffle<T>(items: T[], rng: () => number = Math.random): T[] {
++  const result = [...items]
++  for (let i = result.length - 1; i > 0; i--) {
++    const j = Math.floor(rng() * (i + 1))
++    ;[result[i], result[j]] = [result[j], result[i]]
++  }
++  return result
++}
++
++export function scoreCommentary(pct: number): string {
++  if (pct >= 90) return '掌握度已經相當穩固，可以往下一個範圍推進。'
++  if (pct >= 70) return '基礎不錯，把答錯的題目再看過一次解析即可。'
++  if (pct >= 50) return '還有一半左右不熟，建議重讀相關內容後再測一次。'
++  return '先把答錯題目的解析讀熟，再回頭重測一次會更有感。'
++}
