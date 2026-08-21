@@ -6,20 +6,11 @@
 }
 .hm-check input { accent-color: var(--accent); cursor: pointer; }
 
-.hm-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--rule);
-}
 .hm-shuffle {
   display: flex;
   align-items: center;
   gap: .5rem;
-  font-size: .86rem;
+  font-size: .9375rem;
   color: var(--ink-2);
   cursor: pointer;
 }
@@ -42,3 +33,7 @@
   cursor: not-allowed;
 }
 .hm-start:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.hm-total { margin: 0 0 .8rem; font-family: var(--font-mono); font-size: 1rem; color: var(--ink); }
+.hm-shuffle { margin-bottom: .9rem; }
+.hm-start { width: 100%; }

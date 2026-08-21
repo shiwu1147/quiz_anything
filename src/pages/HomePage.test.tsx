@@ -5,8 +5,13 @@ import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { describe, it, expect, vi } from 'vitest'
 import HomePage from './HomePage'
 import * as dataLoader from '../lib/dataLoader'
+import * as bankSnapshot from '../lib/bankSnapshot'
 
 vi.mock('../lib/dataLoader')
+vi.mock('../lib/bankSnapshot', async (importOriginal) => {
+  const actual = await importOriginal<typeof bankSnapshot>()
+  return { ...actual, loadBankSnapshot: vi.fn() }
+})
 
 function QuizStub() {
   const location = useLocation()
@@ -45,9 +50,22 @@ const multiSubjectIndexData = {
   ],
 }
 
+function snapshotOf(
+  index: { subjects: Array<{ id: string; name: string; order: number }>; chapters: Array<{ id: string; subjectId: string; name: string; order: number }> },
+  counts: Array<[string, number]>,
+) {
+  return {
+    index,
+    raws: new Map(counts.map(([id]) => [id, { ok: true as const, data: [] }])),
+    counts: new Map(counts),
+  }
+}
+
 describe('HomePage', () => {
   it('renders subjects as shelf buttons inside the app shell', async () => {
-    vi.mocked(dataLoader.loadIndex).mockResolvedValue(multiSubjectIndexData)
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue(
+      snapshotOf(multiSubjectIndexData, [['c1', 25], ['c2', 18], ['c3', 30]]),
+    )
 
     renderHome()
 
@@ -60,7 +78,9 @@ describe('HomePage', () => {
   })
 
   it('lists chapters for the selected subject and starts the quiz with merged questions', async () => {
-    vi.mocked(dataLoader.loadIndex).mockResolvedValue(indexData)
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue(
+      snapshotOf(indexData, [['c1', 25], ['c2', 18]]),
+    )
     vi.mocked(dataLoader.loadMergedQuestions).mockResolvedValue([
       { id: 'q1', chapterId: 'c1', stem: '題', options: ['A', 'B', 'C', 'D'], answerIndex: 0, explanation: 'e' },
       { id: 'q2', chapterId: 'c2', stem: '題', options: ['A', 'B', 'C', 'D'], answerIndex: 0, explanation: 'e' },
@@ -79,7 +99,9 @@ describe('HomePage', () => {
   })
 
   it('disables the start button until at least one chapter is selected', async () => {
-    vi.mocked(dataLoader.loadIndex).mockResolvedValue(indexData)
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue(
+      snapshotOf(indexData, [['c1', 25], ['c2', 18]]),
+    )
 
     renderHome()
 
@@ -88,7 +110,9 @@ describe('HomePage', () => {
   })
 
   it('clears the chapter selection when switching to another subject and back', async () => {
-    vi.mocked(dataLoader.loadIndex).mockResolvedValue(multiSubjectIndexData)
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue(
+      snapshotOf(multiSubjectIndexData, [['c1', 25], ['c2', 18], ['c3', 30]]),
+    )
 
     renderHome()
 
@@ -102,5 +126,17 @@ describe('HomePage', () => {
 
     const firstChapterCheckboxAgain = screen.getByLabelText('第一章') as HTMLInputElement
     expect(firstChapterCheckboxAgain).not.toBeChecked()
+  })
+  it('shows the selected chapter and question totals in the margin', async () => {
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue(
+      snapshotOf(indexData, [['c1', 25], ['c2', 18]]),
+    )
+
+    renderHome()
+
+    await userEvent.click(await screen.findByRole('button', { name: '國文' }))
+    await userEvent.click(screen.getByLabelText('第一章'))
+
+    expect(screen.getByText('已選 1 章 · 約 25 題')).toBeInTheDocument()
   })
 })
