@@ -1,6 +1,9 @@
 // src/pages/HomePage.tsx
+import './home.css'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AppShell } from '../components/shell/AppShell'
+import { SubjectShelf } from '../components/shell/SubjectShelf'
 import { loadIndex, loadMergedQuestions } from '../lib/dataLoader'
 import { shuffle } from '../lib/quizLogic'
 import type { IndexData } from '../lib/schema'
@@ -17,8 +20,8 @@ export default function HomePage() {
     loadIndex().then(setIndexData).catch((e: Error) => setError(e.message))
   }, [])
 
-  if (error) return <p>{error}</p>
-  if (!indexData) return <p>載入題庫中…</p>
+  if (error) return <AppShell zone="quiz"><p className="sh-empty">{error}</p></AppShell>
+  if (!indexData) return <AppShell zone="quiz"><p className="sh-empty">載入題庫中…</p></AppShell>
 
   const subjects = [...indexData.subjects].sort((a, b) => a.order - b.order)
   const chaptersForSubject = indexData.chapters
@@ -48,46 +51,57 @@ export default function HomePage() {
   }
 
   return (
-    <div>
-      <h1>問答題庫</h1>
-      <ul>
-        {subjects.map((subject) => (
-          <li key={subject.id}>
-            <button type="button" onClick={() => selectSubject(subject.id)}>
-              {subject.name}
-            </button>
-          </li>
-        ))}
-      </ul>
-      {selectedSubject && (
-        <div>
-          <ul>
-            {chaptersForSubject.map((chapter) => (
-              <li key={chapter.id}>
-                <label>
+    <AppShell zone="quiz">
+      <div className="sh-shelf-layout">
+        <SubjectShelf subjects={subjects} selectedId={selectedSubjectId} onSelect={selectSubject} />
+        <div className="sh-sheet">
+          <div className="sh-sheet-head">
+            <h1 className="sh-sheet-title">{selectedSubject ? selectedSubject.name : '複習'}</h1>
+            {selectedSubject && (
+              <span className="sh-sheet-meta">已選 {selectedChapterIds.size} 卷</span>
+            )}
+          </div>
+
+          {selectedSubject ? (
+            <>
+              <ul className="sh-toc">
+                {chaptersForSubject.map((chapter) => (
+                  <li key={chapter.id} className="sh-toc-row">
+                    <label className="hm-check">
+                      <input
+                        type="checkbox"
+                        checked={selectedChapterIds.has(chapter.id)}
+                        onChange={() => toggleChapter(chapter.id)}
+                      />
+                      <span className="sh-toc-name">{chapter.name}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              <div className="hm-bar">
+                <label className="hm-shuffle">
                   <input
                     type="checkbox"
-                    checked={selectedChapterIds.has(chapter.id)}
-                    onChange={() => toggleChapter(chapter.id)}
+                    checked={shuffleEnabled}
+                    onChange={(e) => setShuffleEnabled(e.target.checked)}
                   />
-                  {chapter.name}
+                  隨機排序題目
                 </label>
-              </li>
-            ))}
-          </ul>
-          <label>
-            <input
-              type="checkbox"
-              checked={shuffleEnabled}
-              onChange={(e) => setShuffleEnabled(e.target.checked)}
-            />
-            隨機排序題目
-          </label>
-          <button type="button" disabled={selectedChapterIds.size === 0} onClick={handleStart}>
-            開始複習
-          </button>
+                <button
+                  type="button"
+                  className="hm-start"
+                  disabled={selectedChapterIds.size === 0}
+                  onClick={handleStart}
+                >
+                  開始複習
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="sh-empty">選一個科目，挑幾卷來複習。</p>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </AppShell>
   )
 }

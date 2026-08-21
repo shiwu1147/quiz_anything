@@ -46,6 +46,19 @@ const multiSubjectIndexData = {
 }
 
 describe('HomePage', () => {
+  it('renders subjects as shelf buttons inside the app shell', async () => {
+    vi.mocked(dataLoader.loadIndex).mockResolvedValue(multiSubjectIndexData)
+
+    renderHome()
+
+    const spine = await screen.findByRole('button', { name: '國文' })
+    expect(spine).toHaveAttribute('aria-pressed', 'false')
+
+    await userEvent.click(spine)
+    expect(screen.getByRole('button', { name: '國文' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('link', { name: '題庫' })).toBeInTheDocument()
+  })
+
   it('lists chapters for the selected subject and starts the quiz with merged questions', async () => {
     vi.mocked(dataLoader.loadIndex).mockResolvedValue(indexData)
     vi.mocked(dataLoader.loadMergedQuestions).mockResolvedValue([
