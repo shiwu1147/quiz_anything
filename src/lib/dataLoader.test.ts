@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { loadIndex, loadChapterQuestions, loadMergedQuestions } from './dataLoader'
+import { loadIndex, loadChapterQuestions, loadMergedQuestions, fetchChapterRaw } from './dataLoader'
 
 function mockFetchOnce(url: string, body: unknown, ok = true, status = 200) {
   return { url, ok, status, json: async () => body }
@@ -71,5 +71,57 @@ describe('loadMergedQuestions', () => {
     const result = await loadMergedQuestions(['c1', 'c2'])
 
     expect(result.map((q) => q.id)).toEqual(['q1', 'q2', 'q3'])
+  })
+})
+
+describe('fetchChapterRaw', () => {
+  const question = {
+    id: 'q1', chapterId: 'c1', stem: '題幹',
+    options: ['A', 'B', 'C', 'D'], answerIndex: 0, explanation: '解析',
+  }
+
+  it('returns the raw body when the response is ok', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => mockFetchOnce(url, [question])))
+
+    const result = await fetchChapterRaw('c1')
+
+    expect(fetch).toHaveBeenCalledWith('/data/questions/c1.json')
+    expect(result).toEqual({ ok: true, data: [question] })
+  })
+
+  it('reports an http failure instead of throwing', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => mockFetchOnce(url, {}, false, 404)))
+
+    const result = await fetchChapterRaw('c-missing')
+
+    expect(result.ok).toBe(false)
+    if (result.ok) throw new Error('expected failure')
+    expect(result.reason).toBe('http')
+    expect(result.detail).toMatch(/404/)
+  })
+
+  it('reports a json failure when the body cannot be parsed', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => { throw new SyntaxError('Unexpected token }') },
+    })))
+
+    const result = await fetchChapterRaw('c-broken')
+
+    expect(result.ok).toBe(false)
+    if (result.ok) throw new Error('expected failure')
+    expect(result.reason).toBe('json')
+    expect(result.detail).toMatch(/Unexpected token/)
+  })
+
+  it('reports an http failure when fetch itself rejects', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch') }))
+
+    const result = await fetchChapterRaw('c1')
+
+    expect(result.ok).toBe(false)
+    if (result.ok) throw new Error('expected failure')
+    expect(result.reason).toBe('http')
   })
 })

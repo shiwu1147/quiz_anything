@@ -8,6 +8,27 @@ async function fetchJson(url: string): Promise<unknown> {
   return res.json()
 }
 
+export type RawResult =
+  | { ok: true; data: unknown }
+  | { ok: false; reason: 'http' | 'json'; detail: string }
+
+export async function fetchChapterRaw(chapterId: string): Promise<RawResult> {
+  let res: Response
+  try {
+    res = await fetch(`/data/questions/${chapterId}.json`)
+  } catch (e) {
+    return { ok: false, reason: 'http', detail: (e as Error).message }
+  }
+  if (!res.ok) {
+    return { ok: false, reason: 'http', detail: `HTTP ${res.status}` }
+  }
+  try {
+    return { ok: true, data: await res.json() }
+  } catch (e) {
+    return { ok: false, reason: 'json', detail: (e as Error).message }
+  }
+}
+
 export async function loadIndex(): Promise<IndexData> {
   const raw = await fetchJson('/data/index.json')
   const result = indexDataSchema.safeParse(raw)
