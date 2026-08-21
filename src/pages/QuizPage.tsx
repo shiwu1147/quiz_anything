@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
+import { AppShell } from '../components/shell/AppShell'
 import { QuizEngine } from '../components/quiz/QuizEngine'
 import type { Question } from '../lib/schema'
 
@@ -12,5 +13,9 @@ export default function QuizPage() {
     return <Navigate to="/" replace />
   }
 
-  return <QuizEngine questions={state.questions} title={state.title ?? '測驗'} />
+  return (
+    <AppShell zone="quiz">
+      <QuizEngine questions={state.questions} title={state.title ?? '測驗'} />
+    </AppShell>
+  )
 }

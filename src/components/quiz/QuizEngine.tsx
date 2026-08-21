@@ -1,4 +1,5 @@
 // src/components/quiz/QuizEngine.tsx
+import './quiz.css'
 import { useEffect, useState } from 'react'
 import { ProgressRail, type RailResult } from './ProgressRail'
 import { QuestionCard } from './QuestionCard'
@@ -69,8 +70,8 @@ export function QuizEngine({ questions, title }: { questions: Question[]; title:
   )
 
   return (
-    <div>
-      <h1>{title}</h1>
+    <div className="quiz-page">
+      <h1 className="quiz-title">{title}</h1>
       <ProgressRail total={questions.length} current={currentIndex} results={results} />
       <QuestionCard
         question={questions[currentIndex]}

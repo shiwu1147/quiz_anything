@@ -31,6 +31,23 @@ describe('QuizPage', () => {
     expect(screen.getByText('題目一')).toBeInTheDocument()
   })
 
+  it('wraps the quiz in the app shell', () => {
+    renderAt([
+      {
+        pathname: '/quiz',
+        state: {
+          title: '測試複習',
+          questions: [
+            { id: 'q1', chapterId: 'c1', stem: '題目一', options: ['A', 'B', 'C', 'D'], answerIndex: 0, explanation: 'e' },
+          ],
+        },
+      },
+    ])
+
+    expect(screen.getByText('問答題庫')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '題庫' })).toBeInTheDocument()
+  })
+
   it('redirects to home when there is no navigation state', () => {
     renderAt(['/quiz'])
     expect(screen.getByText('HOME')).toBeInTheDocument()
