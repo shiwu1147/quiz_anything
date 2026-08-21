@@ -1,5 +1,5 @@
 // src/components/quiz/QuizEngine.test.tsx
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect } from 'vitest'
 import { QuizEngine } from './QuizEngine'
@@ -56,5 +56,21 @@ describe('QuizEngine', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /再測一次/ }))
     expect(screen.getByText('第一題')).toBeInTheDocument()
+  })
+  it('accumulates wrong answers in the live score while the quiz runs', async () => {
+    const questions: Question[] = [
+      { id: 'q1', chapterId: 'c1', tag: '形近字', stem: '第一題', options: ['甲', '乙', '丙', '丁'], answerIndex: 0, explanation: 'e1' },
+      { id: 'q2', chapterId: 'c1', stem: '第二題', options: ['甲', '乙', '丙', '丁'], answerIndex: 0, explanation: 'e2' },
+    ]
+    render(<QuizEngine questions={questions} title="測試" />)
+
+    expect(screen.getByText('還沒有錯題。')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByText('乙'))
+
+    const live = within(screen.getByRole('complementary'))
+    expect(live.getByText('01')).toBeInTheDocument()
+    expect(live.getByText('形近字')).toBeInTheDocument()
+    expect(live.getByText('答對 0')).toBeInTheDocument()
   })
 })
