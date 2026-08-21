@@ -22,7 +22,7 @@ const question = (id: string, chapterId: string) => ({
 
 function renderBank() {
   return render(
-    <MemoryRouter initialEntries={['/dashboard']}>
+    <MemoryRouter initialEntries={['/bank']}>
       <BankPage />
     </MemoryRouter>,
   )

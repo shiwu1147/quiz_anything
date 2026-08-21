@@ -19,7 +19,7 @@ describe('AppShell', () => {
 
     expect(screen.getByText('問答題庫')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '複習' })).toHaveAttribute('href', '/')
-    expect(screen.getByRole('link', { name: '題庫' })).toHaveAttribute('href', '/dashboard')
+    expect(screen.getByRole('link', { name: '題庫' })).toHaveAttribute('href', '/bank')
   })
 
   it('renders its children', () => {
@@ -29,7 +29,7 @@ describe('AppShell', () => {
   })
 
   it('marks the current zone on the root element', () => {
-    const { container } = renderShell('bank', '/dashboard')
+    const { container } = renderShell('bank', '/bank')
 
     expect(container.querySelector('.sh-root')).toHaveAttribute('data-zone', 'bank')
   })

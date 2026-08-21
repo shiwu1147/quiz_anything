@@ -14,7 +14,7 @@ export function AppShell({ zone, children }: { zone: 'quiz' | 'bank'; children: 
           <div className="sh-brand">問答題庫</div>
           <nav className="sh-nav">
             <NavLink to="/" end className={navClass}>複習</NavLink>
-            <NavLink to="/dashboard" className={navClass}>題庫</NavLink>
+            <NavLink to="/bank" className={navClass}>題庫</NavLink>
           </nav>
         </div>
       </header>
