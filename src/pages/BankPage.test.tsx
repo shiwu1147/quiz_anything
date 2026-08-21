@@ -3,9 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, expect, vi } from 'vitest'
 import BankPage from './BankPage'
-import * as dataLoader from '../lib/dataLoader'
+import * as bankSnapshot from '../lib/bankSnapshot'
 
-vi.mock('../lib/dataLoader')
+vi.mock('../lib/bankSnapshot', async (importOriginal) => {
+  const actual = await importOriginal<typeof bankSnapshot>()
+  return { ...actual, loadBankSnapshot: vi.fn() }
+})
 
 const indexData = {
   subjects: [{ id: 's1', name: '國文', order: 0 }],
@@ -29,25 +32,31 @@ function renderBank() {
 }
 
 describe('BankPage', () => {
-  it('reports a clean bank', async () => {
-    vi.mocked(dataLoader.loadIndex).mockResolvedValue(indexData)
-    vi.mocked(dataLoader.fetchChapterRaw).mockImplementation(async (id: string) => ({
-      ok: true,
-      data: [question(`${id}-q1`, id)],
-    }))
+  it('reports a clean bank and totals it in the margin', async () => {
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue({
+      index: indexData,
+      raws: new Map([
+        ['c1', { ok: true, data: [question('q1', 'c1'), question('q2', 'c1')] }],
+        ['c2', { ok: true, data: [question('q3', 'c2')] }],
+      ]),
+      counts: new Map([['c1', 2], ['c2', 1]]),
+    })
 
     renderBank()
 
     expect(await screen.findByText('題庫沒有問題。')).toBeInTheDocument()
+    expect(screen.getByText('1 科 · 2 章 · 3 題')).toBeInTheDocument()
   })
 
   it('shows a finding naming the chapter whose file is missing', async () => {
-    vi.mocked(dataLoader.loadIndex).mockResolvedValue(indexData)
-    vi.mocked(dataLoader.fetchChapterRaw).mockImplementation(async (id: string) =>
-      id === 'c2'
-        ? { ok: false, reason: 'http' as const, detail: 'HTTP 404' }
-        : { ok: true, data: [question('c1-q1', 'c1')] },
-    )
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue({
+      index: indexData,
+      raws: new Map([
+        ['c1', { ok: true, data: [question('q1', 'c1')] }],
+        ['c2', { ok: false, reason: 'http', detail: 'HTTP 404' }],
+      ]),
+      counts: new Map([['c1', 1]]),
+    })
 
     renderBank()
 
@@ -57,13 +66,14 @@ describe('BankPage', () => {
   })
 
   it('lists the chapters of the selected subject with their question counts', async () => {
-    vi.mocked(dataLoader.loadIndex).mockResolvedValue(indexData)
-    vi.mocked(dataLoader.fetchChapterRaw).mockImplementation(async (id: string) => ({
-      ok: true,
-      data: id === 'c1'
-        ? [question('c1-q1', 'c1'), question('c1-q2', 'c1')]
-        : [question('c2-q1', 'c2')],
-    }))
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockResolvedValue({
+      index: indexData,
+      raws: new Map([
+        ['c1', { ok: true, data: [question('q1', 'c1'), question('q2', 'c1')] }],
+        ['c2', { ok: true, data: [question('q3', 'c2')] }],
+      ]),
+      counts: new Map([['c1', 2], ['c2', 1]]),
+    })
 
     renderBank()
 
@@ -75,7 +85,7 @@ describe('BankPage', () => {
   })
 
   it('shows a single finding when the index itself cannot be read', async () => {
-    vi.mocked(dataLoader.loadIndex).mockRejectedValue(new Error('題庫索引格式錯誤：boom'))
+    vi.mocked(bankSnapshot.loadBankSnapshot).mockRejectedValue(new Error('題庫索引格式錯誤：boom'))
 
     renderBank()
 
