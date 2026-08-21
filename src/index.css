@@ -48,7 +48,11 @@ body {
   background: var(--ground);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.75;
   -webkit-font-smoothing: antialiased;
+}
+
+@media (min-width: 1600px) {
+  :root { font-size: 112.5%; }
 }

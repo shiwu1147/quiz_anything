@@ -11,9 +11,7 @@
   border-bottom: 1px solid var(--rule);
 }
 .sh-head-inner {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: .85rem clamp(1rem, 4vw, 1.5rem);
+  padding: .85rem clamp(1rem, 3vw, 2.5rem);
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -25,7 +23,7 @@
   letter-spacing: .14em;
   color: var(--ink);
 }
-.sh-nav { display: flex; gap: 1.1rem; font-size: .88rem; }
+.sh-nav { display: flex; gap: 1.1rem; font-size: .9375rem; }
 .sh-nav a {
   color: var(--ink-3);
   text-decoration: none;
@@ -42,9 +40,7 @@
 
 .sh-main {
   width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 1.5rem) 3rem;
+  padding: clamp(1rem, 4vw, 2rem) clamp(1rem, 3vw, 2.5rem) 3rem;
   flex: 1;
 }
 
@@ -105,14 +101,14 @@
 }
 .sh-sheet-title {
   font-family: var(--font-display);
-  font-size: clamp(1.1rem, 3vw, 1.35rem);
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: .06em;
   margin: 0;
 }
 .sh-sheet-meta {
   font-family: var(--font-mono);
-  font-size: .78rem;
+  font-size: .875rem;
   color: var(--ink-3);
 }
 
@@ -126,9 +122,9 @@
   border-bottom: 1px solid var(--rule-soft);
 }
 .sh-toc-name { font-family: var(--font-display); }
-.sh-toc-aside { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-3); flex: none; }
+.sh-toc-aside { font-family: var(--font-mono); font-size: .875rem; color: var(--ink-3); flex: none; }
 
-.sh-empty { color: var(--ink-3); font-size: .92rem; }
+.sh-empty { color: var(--ink-3); font-size: .9375rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .sh-spine { transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease; }
