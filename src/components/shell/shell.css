@@ -44,44 +44,45 @@
   flex: 1;
 }
 
-.sh-shelf-layout {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: clamp(1rem, 3vw, 1.75rem);
-  align-items: start;
-}
 .sh-shelf {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: .5rem;
-  margin: 0;
-  padding: 0;
+  margin: 0 0 clamp(1rem, 2.5vw, 1.75rem);
+  padding: 0 0 .3rem;
   list-style: none;
+  overflow-x: auto;
 }
 .sh-spine {
   writing-mode: vertical-rl;
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
   font: inherit;
   font-family: var(--font-display);
-  font-size: .98rem;
-  letter-spacing: .22em;
   color: var(--ink-2);
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: 2px;
-  padding: 1rem .45rem;
-  min-height: 7rem;
-  width: 100%;
+  width: 88px;
+  height: 140px;
+  padding: .9rem .5rem;
+  flex: none;
   text-align: start;
   cursor: pointer;
   transition: transform 160ms ease, color 160ms ease, border-color 160ms ease, background-color 160ms ease;
 }
+.sh-shelf[data-density="wide"] .sh-spine { width: 160px; }
+.sh-spine-name { font-size: 1.125rem; letter-spacing: .22em; }
+.sh-spine-meta { font-family: var(--font-mono); font-size: .875rem; color: var(--ink-3); letter-spacing: .06em; }
 .sh-spine:hover { color: var(--ink); border-color: var(--accent-line); }
 .sh-spine[aria-pressed="true"] {
   color: var(--accent-ink);
   background: var(--accent-soft);
   border-color: var(--accent);
-  transform: translateX(6px);
+  transform: translateY(6px);
 }
+.sh-spine[aria-pressed="true"] .sh-spine-meta { color: var(--accent); }
 
 .sh-sheet {
   background: var(--surface);
@@ -132,15 +133,14 @@
 }
 
 @media (max-width: 640px) {
-  .sh-shelf-layout { grid-template-columns: 1fr; }
-  .sh-shelf { flex-direction: row; overflow-x: auto; padding-bottom: .3rem; }
   .sh-spine {
     writing-mode: horizontal-tb;
-    min-height: 0;
     width: auto;
-    flex: none;
-    padding: .45rem .9rem;
-    letter-spacing: .08em;
+    height: auto;
+    padding: .5rem .9rem;
+    align-items: baseline;
   }
+  .sh-shelf[data-density="wide"] .sh-spine { width: auto; }
+  .sh-spine-name { letter-spacing: .08em; }
   .sh-spine[aria-pressed="true"] { transform: none; }
 }

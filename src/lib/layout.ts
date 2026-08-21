@@ -1,3 +1,5 @@
+export type SubjectMeta = { chapters: number; questions: number }
+
 export type ShelfDensity = 'wide' | 'normal'
 
 export function shelfDensity(subjectCount: number): ShelfDensity {
